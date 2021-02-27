@@ -85,6 +85,8 @@ namespace Business.Concrete
             throw new NotImplementedException();
         }
 
+        //iş kuralları private olarak yazılır .
+
         private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
         {
             var result = _productDal.GetAll(p => p.CategoryId ==categoryId).Count;
@@ -106,7 +108,9 @@ namespace Business.Concrete
 
         private IResult CheckIfCategoryLimitExceded()
         {
+            // CategoryService'te GetAll() metodunun kuralları var. onu sadece çağırıyoruz.
             var result = _categoryService.GetAll();
+            // Çağırdığımız dataları nasıl ele alacağımızı yorumladık.
             if (result.Data.Count > 15)
             {
                 return new ErrorResult(Messages.CategoryLimitExceded);
