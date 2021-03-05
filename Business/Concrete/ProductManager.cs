@@ -1,4 +1,5 @@
 ﻿using Business.Abstract;
+using Business.BusinessAspects.Autofac;
 using Business.CCC;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
@@ -19,6 +20,9 @@ namespace Business.Concrete
 {
     // iş kurallarını 
     // bir entity manager kendisi hariç başka bir Dal'ı enjekte edemez.
+    // bir iş sınıfı başka sınıfları new'lemez.
+    // iş kuralları private olarak yazılır .
+    //validation: doğrulama, nesnenin iş kurallarına dahil edilmesi için doğrulama yapılması gerekiyor.
     public class ProductManager : IProductService
     {
         IProductDal _productDal;
@@ -29,9 +33,9 @@ namespace Business.Concrete
             _productDal = productDal;
             _categoryService = categoryService;
         }
-
-        //validation: doğrulama, nesnenin iş kurallarına dahil edilmesi için doğrulama yapılması gerekiyor.
+       
         
+        [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         { //business codes
@@ -55,7 +59,7 @@ namespace Business.Concrete
             {
                 return new ErrorDataResult<List<Product>>(Messages.MaintenanceTime);
             }
-            //bir iş sınıfı başka sınıfları new'lemez.
+            
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(),Messages.ProductsListed);           
         }
 
@@ -85,8 +89,7 @@ namespace Business.Concrete
             throw new NotImplementedException();
         }
 
-        //iş kuralları private olarak yazılır .
-
+        
         private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
         {
             var result = _productDal.GetAll(p => p.CategoryId ==categoryId).Count;
